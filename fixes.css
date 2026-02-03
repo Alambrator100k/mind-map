@@ -1,0 +1,288 @@
+/* =========================================== */
+/* إصلاحات وإضافات جديدة */
+/* =========================================== */
+
+/* إصلاح تحريك الصفحة */
+.mindmap-canvas {
+    cursor: grab;
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+}
+
+.mindmap-canvas.dragging {
+    cursor: grabbing;
+}
+
+/* تحسين الشبكة */
+.canvas-grid.active {
+    display: block;
+}
+
+.canvas-grid.inactive {
+    display: none;
+}
+
+/* تحسين العقد المحددة */
+.mindmap-node.selected {
+    z-index: 1000 !important;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(46, 134, 171, 0.3), 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(46, 134, 171, 0.5), 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* تحسين منطقة التحرير */
+.node-edit-textarea {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid var(--primary) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    padding: 15px !important;
+    text-align: center !important;
+    resize: none !important;
+    overflow: hidden !important;
+    font-weight: 500 !important;
+}
+
+/* تحسين الأدوات النشطة */
+.tool-btn.active {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(46, 134, 171, 0.3);
+}
+
+/* تحسين ثيمات الألوان */
+.theme-item.active {
+    background: var(--light);
+    border: 2px solid var(--primary);
+    transform: translateY(-2px);
+}
+
+.theme-preview span {
+    transition: transform 0.2s ease;
+}
+
+.theme-item:hover .theme-preview span {
+    transform: scale(1.1);
+}
+
+/* تحسين شريط التمرير */
+.slider::-webkit-slider-thumb {
+    transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 8px rgba(46, 134, 171, 0.4);
+}
+
+/* تحسين الأزرار */
+.btn-primary:active, 
+.btn-secondary:active, 
+.btn-danger:active {
+    transform: translateY(0) !important;
+}
+
+/* تحسين القوائم المنبثقة */
+.modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) #f0f0f0;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary);
+}
+
+/* تحسين القائمة السياقية */
+.context-menu {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.context-item {
+    transition: all 0.15s ease;
+}
+
+.context-item:hover {
+    transform: translateX(-5px);
+    background: linear-gradient(90deg, rgba(46, 134, 171, 0.1), transparent);
+}
+
+/* تحسين التوست */
+.toast {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid;
+    animation: toastSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(100%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* إصلاح مشاكل التكيف مع الشاشات الصغيرة */
+@media (max-width: 992px) {
+    .app-container {
+        height: calc(100vh - 140px);
+    }
+    
+    .tools-sidebar, .properties-sidebar {
+        flex: none;
+        height: auto;
+        max-height: 200px;
+        overflow-x: auto;
+    }
+    
+    .sidebar-section {
+        min-width: 250px;
+        flex-shrink: 0;
+    }
+}
+
+/* إصلاحات خاصة للهواتف */
+@media (max-width: 768px) {
+    .header-left, .header-right {
+        gap: 8px;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-danger {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-primary span, .btn-secondary span, .btn-danger span {
+        display: none;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .export-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* إصلاح Z-index */
+.mindmap-node {
+    z-index: 10;
+}
+
+.mindmap-connector {
+    z-index: 1;
+}
+
+.view-controls {
+    z-index: 50;
+}
+
+.modal {
+    z-index: 10000;
+}
+
+.context-menu {
+    z-index: 10001;
+}
+
+.toast-container {
+    z-index: 10002;
+}
+
+/* تحسين الأداء والسلاسة */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* تحسين تأثيرات التركيز */
+.form-control:focus,
+.node-text-input:focus,
+.map-title-input:focus {
+    box-shadow: 0 0 0 4px rgba(46, 134, 171, 0.15);
+}
+
+/* تحسين الظلال */
+.mindmap-node {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.mindmap-node:hover {
+    filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15));
+}
+
+/* تحسين خطوط الربط */
+.mindmap-connector path {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* تأثيرات تحميل */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.mindmap-node {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* تحسين النص */
+.node-content {
+    line-height: 1.4;
+    padding: 2px;
+}
+
+/* إضافة تأثيرات للمؤشرات */
+.status-connected {
+    text-shadow: 0 0 8px rgba(42, 157, 143, 0.5);
+}
+
+/* تحسين مظهر الأيقونات */
+.fa-brain {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* تحسين الحالات النشطة */
+input[type="checkbox"]:checked {
+    accent-color: var(--primary);
+}
+
+/* تحسين العلامات */
+.pro-badge {
+    animation: subtlePulse 3s infinite;
+}
+
+@keyframes subtlePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}

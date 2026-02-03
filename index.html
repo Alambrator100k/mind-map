@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMapper Pro - تطبيق خرائط ذهنية احترافي</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fixes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>MindMapper <span class="pro-badge">PRO</span></h1>
+            </div>
+            
+            <div class="quick-actions">
+                <button id="newMapBtn" class="btn-icon" title="خريطة جديدة">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button id="undoBtn" class="btn-icon" title="تراجع">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="redoBtn" class="btn-icon" title="إعادة">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="header-center">
+            <input type="text" id="mapTitleInput" class="map-title-input" value="خريطتي الذهنية" maxlength="50">
+            <div class="map-info">
+                <span id="nodeCount">0 فقاعات</span>
+                <span class="divider">|</span>
+                <span id="connectorCount">0 روابط</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button id="saveBtn" class="btn-primary">
+                <i class="fas fa-save"></i>
+                <span>حفظ</span>
+            </button>
+            <button id="exportBtn" class="btn-export">
+                <i class="fas fa-download"></i>
+                <span>تصدير</span>
+            </button>
+            <button id="shareBtn" class="btn-share" title="مشاركة">
+                <i class="fas fa-share-alt"></i>
+            </button>
+            <button id="fullscreenBtn" class="btn-icon" title="ملء الشاشة">
+                <i class="fas fa-expand"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Left Sidebar - Tools -->
+        <aside class="tools-sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-shapes"></i> إضافة عناصر</h3>
+                <div class="tools-grid">
+                    <button id="addCentralNode" class="tool-btn active" title="عقدة مركزية">
+                        <i class="fas fa-bullseye"></i>
+                        <span>مركزية</span>
+                    </button>
+                    <button id="addChildNode" class="tool-btn" title="عقدة فرعية">
+                        <i class="fas fa-circle-plus"></i>
+                        <span>فرعية</span>
+                    </button>
+                    <button id="addSiblingNode" class="tool-btn" title="عقدة شقيقة">
+                        <i class="fas fa-copy"></i>
+                        <span>شقيقة</span>
+                    </button>
+                    <button id="addConnectorBtn" class="tool-btn" title="إضافة رابط">
+                        <i class="fas fa-link"></i>
+                        <span>رابط</span>
+                    </button>
+                    <button id="addImageBtn" class="tool-btn" title="إضافة صورة">
+                        <i class="fas fa-image"></i>
+                        <span>صورة</span>
+                    </button>
+                    <button id="addIconBtn" class="tool-btn" title="إضافة أيقونة">
+                        <i class="fas fa-icons"></i>
+                        <span>أيقونة</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-palette"></i> التصميم</h3>
+                <div class="color-palette">
+                    <div class="color-theme">
+                        <h4>ثيمات الألوان</h4>
+                        <div class="theme-grid">
+                            <div class="theme-item professional" data-theme="professional">
+                                <div class="theme-preview">
+                                    <span style="background:#2E86AB"></span>
+                                    <span style="background:#A23B72"></span>
+                                    <span style="background:#F18F01"></span>
+                                    <span style="background:#C73E1D"></span>
+                                </div>
+                                <span>احترافي</span>
+                            </div>
+                            <div class="theme-item creative" data-theme="creative">
+                                <div class="theme-preview">
+                                    <span style="background:#9D4EDD"></span>
+                                    <span style="background:#FF6B6B"></span>
+                                    <span style="background:#4ECDC4"></span>
+                                    <span style="background:#FFD166"></span>
+                                </div>
+                                <span>إبداعي</span>
+                            </div>
+                            <div class="theme-item nature" data-theme="nature">
+                                <div class="theme-preview">
+                                    <span style="background:#2A9D8F"></span>
+                                    <span style="background:#E9C46A"></span>
+                                    <span style="background:#E76F51"></span>
+                                    <span style="background:#264653"></span>
+                                </div>
+                                <span>طبيعي</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nodeColor">لون الفقاعة:</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="nodeColor" value="#4a90e2">
+                            <div class="quick-colors">
+                                <span class="quick-color" style="background:#2E86AB"></span>
+                                <span class="quick-color" style="background:#A23B72"></span>
+                                <span class="quick-color" style="background:#F18F01"></span>
+                                <span class="quick-color" style="background:#9D4EDD"></span>
+                                <span class="quick-color" style="background:#2A9D8F"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nodeShape">شكل الفقاعة:</label>
+                        <div class="shape-selector">
+                            <button class="shape-btn" data-shape="circle" title="دائري">
+                                <div class="shape-preview circle"></div>
+                            </button>
+                            <button class="shape-btn" data-shape="rounded" title="مستدير">
+                                <div class="shape-preview rounded"></div>
+                            </button>
+                            <button class="shape-btn active" data-shape="rectangle" title="مستطيل">
+                                <div class="shape-preview rectangle"></div>
+                            </button>
+                            <button class="shape-btn" data-shape="cloud" title="سحابة">
+                                <div class="shape-preview cloud"></div>
+                            </button>
+                            <button class="shape-btn" data-shape="hexagon" title="سداسي">
+                                <div class="shape-preview hexagon"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-sliders-h"></i> إعدادات النص</h3>
+                <div class="text-settings">
+                    <div class="form-group">
+                        <label for="fontFamily">الخط:</label>
+                        <select id="fontFamily" class="form-control">
+                            <option value="Cairo">Cairo</option>
+                            <option value="Tajawal">Tajawal</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fontSize">حجم الخط: <span id="fontSizeValue">16</span>px</label>
+                        <input type="range" id="fontSize" min="10" max="36" value="16" class="slider">
+                    </div>
+                    
+                    <div class="text-formatting">
+                        <button class="format-btn" data-format="bold" title="عريض">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="format-btn" data-format="italic" title="مائل">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="format-btn" data-format="underline" title="تحته خط">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <div class="canvas-wrapper">
+                <div id="mindmapCanvas" class="mindmap-canvas">
+                    <div class="canvas-grid"></div>
+                    <!-- المركز الإرشادي -->
+                    <div class="center-guide">
+                        <div class="guide-circle"></div>
+                        <div class="guide-text">ابدأ من هنا</div>
+                    </div>
+                </div>
+                
+                <!-- التحكم في العرض -->
+                <div class="view-controls">
+                    <button id="zoomOutBtn" class="view-btn" title="تصغير">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <span id="zoomLevel">100%</span>
+                    <button id="zoomInBtn" class="view-btn" title="تكبير">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button id="resetViewBtn" class="view-btn" title="إعادة تعيين">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                    <button id="fitToScreenBtn" class="view-btn" title="ملاءمة للشاشة">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- تعليمات سريعة -->
+            <div class="quick-help">
+                <p><i class="fas fa-mouse-pointer"></i> انقر واسحب لتحريك الفقاعات</p>
+                <p><i class="fas fa-edit"></i> انقر نقرًا مزدوجًا لتعديل النص</p>
+                <p><i class="fas fa-plus-circle"></i> انقر على الأداة ثم انقر على الفقاعة لإضافة فرعية</p>
+            </div>
+        </main>
+
+        <!-- Right Sidebar - Properties -->
+        <aside class="properties-sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-cog"></i> خصائص العقدة</h3>
+                <div id="nodeProperties" class="properties-content">
+                    <div class="property-group">
+                        <label>النص:</label>
+                        <textarea id="nodeText" class="node-text-input" placeholder="أدخل النص هنا..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="property-group">
+                        <label>حجم الفقاعة:</label>
+                        <div class="size-controls">
+                            <button class="size-btn" data-size="small">صغير</button>
+                            <button class="size-btn active" data-size="medium">وسط</button>
+                            <button class="size-btn" data-size="large">كبير</button>
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <label>الحدود:</label>
+                        <div class="border-controls">
+                            <input type="color" id="borderColor" value="#ffffff">
+                            <input type="range" id="borderWidth" min="0" max="10" value="3" class="slider">
+                            <span id="borderWidthValue">3px</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <label>التظليل:</label>
+                        <div class="shadow-controls">
+                            <input type="checkbox" id="shadowToggle" checked>
+                            <label for="shadowToggle" class="toggle-label">تفعيل التظليل</label>
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <label>الشفافية:</label>
+                        <input type="range" id="opacitySlider" min="50" max="100" value="100" class="slider">
+                        <span id="opacityValue">100%</span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="deleteNodeBtn" class="btn-danger">
+                            <i class="fas fa-trash"></i> حذف العقدة
+                        </button>
+                        <button id="duplicateNodeBtn" class="btn-secondary">
+                            <i class="fas fa-copy"></i> نسخ العقدة
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-project-diagram"></i> إعدادات الخريطة</h3>
+                <div class="map-settings">
+                    <div class="form-group">
+                        <label for="layoutType">نمط التخطيط:</label>
+                        <select id="layoutType" class="form-control">
+                            <option value="radial">شعاعي</option>
+                            <option value="tree">شجري رأسي</option>
+                            <option value="horizontal">شجري أفقي</option>
+                            <option value="org">تنظيمي</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="backgroundColor">خلفية الخريطة:</label>
+                        <input type="color" id="backgroundColor" value="#f8f9fa">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gridToggle">إظهار الشبكة:</label>
+                        <input type="checkbox" id="gridToggle" checked>
+                    </div>
+                    
+                    <button id="arrangeBtn" class="btn-primary full-width">
+                        <i class="fas fa-sitemap"></i> ترتيب تلقائي
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-th-large"></i> القوالب السريعة</h3>
+                <div class="quick-templates">
+                    <div class="template-item" data-template="brainstorm">
+                        <div class="template-preview brainstorm">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <span>عصف ذهني</span>
+                    </div>
+                    <div class="template-item" data-template="study">
+                        <div class="template-preview study">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <span>دراسة</span>
+                    </div>
+                    <div class="template-item" data-template="project">
+                        <div class="template-preview project">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <span>مشروع</span>
+                    </div>
+                    <div class="template-item" data-template="swot">
+                        <div class="template-preview swot">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span>تحليل SWOT</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Bottom Bar -->
+    <footer class="app-footer">
+        <div class="footer-left">
+            <div class="mode-toggle">
+                <span class="mode-label">الوضع الليلي:</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="footer-center">
+            <div class="status-indicator">
+                <i class="fas fa-circle status-connected"></i>
+                <span>جاهز</span>
+            </div>
+        </div>
+        
+        <div class="footer-right">
+            <button id="helpBtn" class="btn-icon" title="مساعدة">
+                <i class="fas fa-question-circle"></i>
+            </button>
+            <button id="templatesBtn" class="btn-icon" title="المزيد من القوالب">
+                <i class="fas fa-th-large"></i>
+            </button>
+            <button id="settingsBtn" class="btn-icon" title="الإعدادات">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-download"></i> تصدير الخريطة</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-grid">
+                    <div class="export-option" data-type="png">
+                        <div class="export-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <h4>صورة PNG</h4>
+                        <p>جودة عالية - شفافية</p>
+                    </div>
+                    <div class="export-option" data-type="jpg">
+                        <div class="export-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <h4>صورة JPG</h4>
+                        <p>حجم أصغر - توافق أفضل</p>
+                    </div>
+                    <div class="export-option" data-type="pdf">
+                        <div class="export-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h4>ملف PDF</h4>
+                        <p>للطباعة والمشاركة</p>
+                    </div>
+                    <div class="export-option" data-type="svg">
+                        <div class="export-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <h4>ملف SVG</h4>
+                        <p>متجهي - قابل للتعديل</p>
+                    </div>
+                </div>
+                
+                <div class="export-settings">
+                    <h4>إعدادات التصدير:</h4>
+                    <div class="form-group">
+                        <label for="exportQuality">الجودة:</label>
+                        <select id="exportQuality" class="form-control">
+                            <option value="high">عالية</option>
+                            <option value="medium">متوسطة</option>
+                            <option value="low">منخفضة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="includeBackground">تضمين الخلفية:</label>
+                        <input type="checkbox" id="includeBackground" checked>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelExportBtn" class="btn-secondary">إلغاء</button>
+                <button id="confirmExportBtn" class="btn-primary">تصدير الآن</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="templatesModal" class="modal">
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h3><i class="fas fa-th-large"></i> معرض القوالب</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="templates-grid" id="templatesGrid">
+                    <!-- سيتم تعبئته بالجافاسكريبت -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> دليل الاستخدام</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-sections">
+                    <div class="help-section">
+                        <h4><i class="fas fa-mouse-pointer"></i> أساسيات التحكم</h4>
+                        <ul>
+                            <li><strong>النقر المزدوج</strong> على الخريطة: إضافة عقدة جديدة</li>
+                            <li><strong>النقر المزدوج</strong> على عقدة: تعديل نص العقدة</li>
+                            <li><strong>النقر والسحب</strong>: تحريك العقدة</li>
+                            <li><strong>النقر</strong> على عقدة: تحديدها</li>
+                            <li><strong>زر Delete</strong>: حذف العقدة المحددة</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h4><i class="fas fa-shapes"></i> الأدوات السريعة</h4>
+                        <ul>
+                            <li><strong>العقدة المركزية</strong>: إضافة عقدة مركزية جديدة</li>
+                            <li><strong>العقدة الفرعية</strong>: إضافة عقدة مرتبطة بالعقدة المحددة</li>
+                            <li><strong>العقدة الشقيقة</strong>: إضافة عقدة بنفس مستوى العقدة المحددة</li>
+                            <li><strong>الرابط</strong>: ربط عقدتين معًا</li>
+                            <li><strong>الصورة</strong>: إضافة صورة كعقدة</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h4><i class="fas fa-keyboard"></i> اختصارات لوحة المفاتيح</h4>
+                        <ul>
+                            <li><strong>Ctrl + N</strong>: خريطة جديدة</li>
+                            <li><strong>Ctrl + S</strong>: حفظ</li>
+                            <li><strong>Ctrl + D</strong>: نسخ العقدة المحددة</li>
+                            <li><strong>Delete</strong>: حذف العقدة المحددة</li>
+                            <li><strong>Ctrl + Z</strong>: تراجع</li>
+                            <li><strong>Ctrl + Y</strong>: إعادة</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-item" data-action="edit">
+            <i class="fas fa-edit"></i> تعديل النص
+        </div>
+        <div class="context-item" data-action="duplicate">
+            <i class="fas fa-copy"></i> نسخ
+        </div>
+        <div class="context-item" data-action="delete">
+            <i class="fas fa-trash"></i> حذف
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item" data-action="addChild">
+            <i class="fas fa-plus-circle"></i> إضافة فرعية
+        </div>
+        <div class="context-item" data-action="addSibling">
+            <i class="fas fa-copy"></i> إضافة شقيقة
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item" data-action="changeColor">
+            <i class="fas fa-palette"></i> تغيير اللون
+        </div>
+        <div class="context-item" data-action="changeShape">
+            <i class="fas fa-shapes"></i> تغيير الشكل
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <!-- صفحة التحميل -->
+<div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+        <div class="loading-logo">
+            <i class="fas fa-brain"></i>
+            <h2>MindMapper Pro</h2>
+        </div>
+        <div class="loading-progress">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <span class="progress-text">جاري التحميل...</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.loading-screen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2c3e50, #4a6491);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity 0.5s ease;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-logo {
+    margin-bottom: 40px;
+}
+
+.loading-logo i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #4fc3f7;
+}
+
+.loading-logo h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.loading-progress {
+    width: 300px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4fc3f7, #2979ff);
+    width: 0%;
+    border-radius: 4px;
+    animation: loading 2s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { width: 0%; }
+    50% { width: 100%; }
+    100% { width: 0%; }
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+</style>
+
+<script>
+// إخفاء صفحة التحميل
+window.addEventListener('load', function() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }, 1000);
+});
+</script>
+</body>
+</html>
